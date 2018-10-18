@@ -6,12 +6,12 @@
 
 -- Your code here
 
-local jogador = require "model.jogador"
-local postoDeCombustivel = require "model.postoDeCombustivel"
-
-function mover()
-	 postoDeCombustivel:movimentacao()
-
+local mapa = require "view.mapa"
+mapa:startMapa()
+function moverMapa()
+	if mapa.barco.imagem ~= nil then
+		mapa:destruirObjetos()
+	end
 end
 
-timer.performWithDelay( 500, mover, 0 )
+timer.performWithDelay( 500, moverMapa, 0)

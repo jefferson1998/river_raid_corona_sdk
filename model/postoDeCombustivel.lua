@@ -13,15 +13,6 @@ function postoDeCombustivel:novoPosto()
 	
 end
 
-function postoDeCombustivel:movimentacao()
-
-	postoDeCombustivel.imagem.x = postoDeCombustivel.imagem.x + 10
-	print(postoDeCombustivel.imagem.contentBounds.xMax)
-	if postoDeCombustivel.imagem.contentBounds.xMax >= display.actualContentWidth then
-		postoDeCombustivel.imagem.x = (postoDeCombustivel.imagem.contentBounds.xMax 
-			- postoDeCombustivel.imagem.contentBounds.xMin) / 2
-	end
-end
 
 function postoDeCombustivel:destruido()
 	postoDeCombustivel.destruido = true
