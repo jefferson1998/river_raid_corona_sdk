@@ -4,9 +4,12 @@ local mapa = {}
 
 
 function mapa:desenhoDoMapa()
-	mapa.areaSegura = {limiteMapa = display.newRect(display.contentCenterX, 
-		display.contentCenterY * 1, 200, 570 ):setFillColor(0,0,1)}
+	mapa.montanhas = {planoDeFundo = display.newRect(display.contentCenterX, 
+		display.contentCenterY, display.actualContentWidth, display.actualContentHeight ):setFillColor(0,0.8,0.2)}
 
+	mapa.limiteDoMapa = {limiteMapa = display.newRect(display.contentCenterX, 
+		display.contentCenterY * 1, 200, 570 ):setFillColor(0,0,1)}
+	
 end
 
 function mapa:startMapa()
@@ -24,6 +27,7 @@ function moverBarco()
 	 mapa.barco:movimentacao()
 	end
 end
+
 
 function mapa:destruirObjetos()
 	if mapa.jogador.jato.imagem.contentBounds.yMax < mapa.barco.imagem.contentBounds.yMin then
