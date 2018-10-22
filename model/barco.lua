@@ -1,3 +1,5 @@
+local physics = require "physics"
+physics.start()
 local barco = {
 	
 }
@@ -32,7 +34,7 @@ function barco:novoBarco()
 	function barco:resetBarco()
 		-- body
 	end
-
+	
 	return barco
 end
 

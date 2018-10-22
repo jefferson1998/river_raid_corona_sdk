@@ -48,8 +48,7 @@ function jogador:novoJogador()
 	Runtime:addEventListener("enterFrame", update)
 
 	return jogador
+
 end
-
-
 
 return jogador

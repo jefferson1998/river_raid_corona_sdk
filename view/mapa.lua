@@ -1,24 +1,30 @@
 local barcoModel = require "model.barco"
 local jogadorModel = require "model.jogador"
+
+local physics = require "physics"
+physics.start( )
+
 local mapa = {}
 
 
 function mapa:desenhoDoMapa()
-	mapa.montanhas = {planoDeFundo = display.newRect(display.contentCenterX, 
-		display.contentCenterY, display.actualContentWidth, display.actualContentHeight ):setFillColor(0,0.8,0.2)}
+	
 
-	mapa.limiteDoMapa = {limiteMapa = display.newRect(display.contentCenterX, 
-		display.contentCenterY * 1, 200, 570 ):setFillColor(0,0,1)}
 	
 end
 
 function mapa:startMapa()
-	mapa:desenhoDoMapa()
-	mapa.barco = barcoModel:novoBarco()
-	print(tostring(mapa.barco.pontuacao))
-	mapa.jogador = jogadorModel:novoJogador()
-end
+	mapa.montanhas = display.newRect(display.contentCenterX, 
+		display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
+	mapa.montanhas:setFillColor(0,0.8,0.2)
 
+	mapa.limiteDoMapa = display.newRect(display.contentCenterX, 
+		display.contentCenterY * 1, 200, 570 ):setFillColor(0,0,1)
+
+	mapa.barco = barcoModel:novoBarco()
+	mapa.jogador = jogadorModel:novoJogador()
+
+end
 
 
 function moverBarco()
@@ -37,6 +43,9 @@ function mapa:destruirObjetos()
 end
 
 
+
 timer.performWithDelay( 500, moverBarco, 0 )
+
+
 
 return mapa
