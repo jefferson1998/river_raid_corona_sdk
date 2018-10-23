@@ -1,5 +1,6 @@
 local jatoJogador = require "model.jato"
 local botoes = require "view.botao"
+
 local passosX, passosY = 0,0
 
 local jogador = {}
