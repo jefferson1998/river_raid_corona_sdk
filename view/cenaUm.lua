@@ -5,8 +5,10 @@ local mapa = require ("view.mapaTeste")
 function cena:create( event )
  	mapa:configurandoImagens()
  	mapa:adicionandoFisica()
+    
     local objetosDaCena = self.view
     -- Code here runs when the cena is first created but has not yet appeared on screen
+    
  
 end
  

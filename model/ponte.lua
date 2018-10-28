@@ -3,6 +3,4 @@ local ponte = {
 	destruida = false,
 }
 
-function ponte:novaPonte()
-	-- body
-end
+return ponte
