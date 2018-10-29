@@ -7,16 +7,17 @@ physics.setGravity(0, 0 )
 local passosX = 0
 
 local mapa = {
-	planoDeFundo = display.newRect(display.contentCenterX, 
-		display.contentCenterY * 0.45, display.actualContentWidth, display.actualContentHeight),
+	planoDeFundo = {
+		parteDireita = display.newRect(0,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight),
+
+		parteEsquerda = display.newRect(display.actualContentWidth ,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight)},
 	
 	limiteDoMapa = display.newRect(display.contentCenterX, 
 		display.contentCenterY * 0.45, 200, 570 ),
 	
-	painelDoPlayer = {tela = display.newRect(display.contentCenterX, 
-		display.contentCenterY * 2.05, display.actualContentWidth, 200 ),
-	pontuacao = display.newText("Score: ", display.contentCenterX * 0.25, 
-		display.contentCenterY * 1.7, native.systemFontBold , 20 ) },
+	painelDoPlayer = {
+		tela = display.newRect(display.contentCenterX, display.contentCenterY * 2.05, display.actualContentWidth, 200 ),
+		pontuacao = display.newText("Score: ", display.contentCenterX * 0.25, display.contentCenterY * 1.7, native.systemFontBold , 20 ) },
 	
 	barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, -10),
 
@@ -24,10 +25,11 @@ local mapa = {
 	
 	helicoptero = display.newImage( "resource/imagens/helicoptero.png", display.contentCenterX *1.5, 100),
 	
-	ponte = display.newImage( "resource/imagens/ponte.png", display.contentCenterX, display.contentCenterY * -0.9),
+	ponte = display.newImage( "resource/imagens/ponte.png", display.contentCenterX *1.01, display.contentCenterY * -0.9),
 	
-	objetosDoCenario = {obj1 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 1.8, 
-		display.contentCenterY ), 	obj2 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 0.2, display.contentCenterY *1.5 ),
+	objetosDoCenario = {
+		obj1 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 1.8, display.contentCenterY ), 	
+		obj2 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 0.2, display.contentCenterY *1.5 ),
  	},
 	
 	jato = 	display.newImage( "resource/imagens/jato.png", display.contentCenterX, display.contentCenterY *1.5 ),
@@ -41,7 +43,7 @@ local mapa = {
 }
 
 function mapa:configurandoImagens()
-	mapa.ponte.width = 200
+	mapa.ponte.width = 198
 	mapa.ponte.height = 40
 	mapa.ponte.id = "p"
 	mapa.helicoptero.width = 25
@@ -54,23 +56,30 @@ function mapa:configurandoImagens()
 	mapa.jato.height = 32
 	mapa.jato.id = "j"
 	mapa.barco.id = "b"
-	mapa.planoDeFundo:setFillColor(0,0.8,0.2)
+	mapa.planoDeFundo.parteDireita:setFillColor(0,0.8,0.2)
+	mapa.planoDeFundo.parteEsquerda:setFillColor(0,0.8,0.2)
 	mapa.limiteDoMapa:setFillColor(0,0.5,1)
 	mapa.painelDoPlayer.tela:setFillColor(0.5,0.2,0.5 )
 end
 
 
 function mapa:adicionandoFisica()
+	physics.addBody(mapa.planoDeFundo.parteDireita, "static")
+	physics.addBody(mapa.planoDeFundo.parteEsquerda, "static")
 	physics.addBody( mapa.ponte)
 	physics.addBody( mapa.barco)
 	physics.addBody( mapa.aviaoInimigo)
 	physics.addBody( mapa.helicoptero)
 	physics.addBody( mapa.jato, "dynamic")
+	mapa.ponte.isFixedRotation = true
+	mapa.barco.isFixedRotation = true
+	mapa.helicoptero.isFixedRotation = true
+	mapa.aviaoInimigo.isFixedRotation = true
 	mapa.jato.isFixedRotation = true
 end
 
 function moverCenario()
-	mapa:resetarMapa()
+	mapa:resetarObjetosDestruidosMapa()
 	-- movimentando helicoptero
 	if  mapa.helicoptero.x ~= nil and mapa.helicoptero.y ~= nil then
 
@@ -109,8 +118,6 @@ end
 function mapa:touch(e)
 
 	if e.phase == "began" then
-			print("maximo" .. mapa.limiteDoMapa.contentBounds.xMax)
-			print("min" ..mapa.limiteDoMapa.contentBounds.xMin)
 		if e.target.myName == "right" then
 			passosX = 1.3
 			
@@ -134,44 +141,65 @@ function atirar(e)
 	end	
 end
 
+-- function mapa:pararCenario()
+-- 	mapa.barco.x = mapa.barco.x + 0
+-- 	mapa.barco.y = mapa.barco.y + 0
+
+-- 	mapa.aviaoInimigo.y = mapa.aviaoInimigo.y + 0
+
+-- 	mapa.helicoptero.x = mapa.helicoptero.x + 0
+-- 	mapa.helicoptero.y = mapa.helicoptero.y + 0
+
+-- 	mapa.ponte.y = mapa.ponte.y + 0
+-- 	mapa.objetosDoCenario.obj1.y = mapa.objetosDoCenario.obj1.y + 0
+-- 	mapa.objetosDoCenario.obj2.y = mapa.objetosDoCenario.obj2.y + 0
+-- end
+
+-- function mapa:pararJogo()
+-- 	mapa.jato:addEventListener("collision", fimDeJogo)
+-- end
+
+-- function fimDeJogo()
+-- 	print("entreiNoFimDeJogo")
+-- 	mapa:pararCenario()
+-- end
 
 function destruirObj(event)
-	
 	display.remove(event.target)
-
 	display.remove(event.other)
-	mapa:atualizaPainelDoUsuario(estadoDoJogo:enterFrame(event.other.id))
-	-- mapa:resetarObjetoDestruido()
+	mapa:atualizaPainelDoUsuario(estadoDoJogo:enterFrame(event.other))
 end
 
 
-
-function mapa:atualizaEstadoDoJogo()
-	
-end
-
-function mapa:resetarObjetoDestruido()
-
-		mapa.barco.y = nil
-		
-end
-
-function mapa:resetarMapa()
+function mapa:resetarObjetosDestruidosMapa()
 	if mapa.barco.y ~= nil then
 		if mapa.jato.contentBounds.yMax < mapa.barco.y then
-				mapa.barco.x, mapa.barco.y = display.contentCenterX *0.5, -150
+			display.remove(mapa.barco)
+			mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, display.contentCenterY * -1.5)
+
 		end
-	end
-	if mapa.aviaoInimigo.y ~= nil then
-		if  mapa.jato.contentBounds.yMax < mapa.aviaoInimigo.y  then
-			mapa.aviaoInimigo.x, mapa.aviaoInimigo.y = display.contentCenterX *0.5, -300
-		end
+	else
+		mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, display.contentCenterY * -1.5)
 	end
 
+	if mapa.aviaoInimigo.y ~= nil then
+		if  mapa.jato.contentBounds.yMax < mapa.aviaoInimigo.y  then
+			display.remove(mapa.aviaoInimigo)
+			mapa.aviaoInimigo = display.newImage( "resource/imagens/aviaoInimigo.png", display.contentCenterX *0.5, display.contentCenterY *  -0.8)	
+
+		end
+	else
+		mapa.aviaoInimigo = display.newImage( "resource/imagens/aviaoInimigo.png", display.contentCenterX *0.5, display.contentCenterY *  -0.8)	
+	end
+	
 	if mapa.helicoptero.y ~= nil then
 		if  mapa.jato.contentBounds.yMax < mapa.helicoptero.y  then
-			mapa.helicoptero.x, mapa.helicoptero.y =display.contentCenterX *1.5, -450
+			display.remove(mapa.helicoptero)
+			mapa.helicoptero = display.newImage( "resource/imagens/helicoptero.png", display.contentCenterX *1.5, display.contentCenterY * -1.2)
+
 		end
+	else
+		mapa.helicoptero = display.newImage( "resource/imagens/helicoptero.png", display.contentCenterX *1.5, display.contentCenterY * -1.2)
 	end
 
 	if mapa.objetosDoCenario.obj1.y ~= nil then
@@ -186,14 +214,17 @@ function mapa:resetarMapa()
 		end
 	end
 
+	if mapa.ponte.y == nil then
+		mapa.ponte = display.newImage( "resource/imagens/ponte.png", display.contentCenterX, display.contentCenterY * -2.9)
+	end
+
+	mapa:configurandoImagens() 
+	mapa:adicionandoFisica()
 end
 
 local update = function ()
-
 	mapa.jato.x = mapa.jato.x + passosX	
-
 end
-
 
 for i=1, #mapa.botoes do
 	mapa.botoes[i]:addEventListener("touch", mapa )
@@ -202,7 +233,7 @@ end
 mapa.botaoTiro:addEventListener( "touch", atirar )
 Runtime:addEventListener("enterFrame", update)
 
-timer.performWithDelay( 20, moverCenario, 0 )
 
+timer.performWithDelay( 15, moverCenario, 0 )
 
 return mapa

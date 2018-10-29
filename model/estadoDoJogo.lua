@@ -9,22 +9,33 @@ local jogador = require ("model.jogador")
 local estadoDoJogo = {}
 
 function estadoDoJogo:enterFrame(argObjeto)
-	if argObjeto == "p" then
+	if argObjeto.id == "p" then
 		jogador:setPontuacao(ponte.pontuacao)
 		ponte.destruida = true
-	elseif argObjeto == "h" then
+		print("ESTADO DO JOGO: OBJETO DESTRUIDO Ponte")
+		print(ponte.destruida)
+		ponte:novaPonte()
+	elseif argObjeto.id == "h" then
 	 	jogador:setPontuacao(helicoptero.pontuacao)
-		helicoptero.destruida = true
-	elseif argObjeto == "b" then
+		helicoptero.destruido = true
+		print("ESTADO DO JOGO:  OBJETO DESTRUIDO Heli")
+		print(helicoptero.destruido)
+		helicoptero:novoHelicoptero()
+	elseif argObjeto.id == "b" then
 	 	jogador:setPontuacao(barco.pontuacao)
 		barco.destruido = true
-	elseif argObjeto == "a" then
+		print("ESTADO DO JOGO: OBJETO DESTRUIDO BARCO")
+		print( barco.destruido)
+		barco:novoBarco()
+	elseif argObjeto.id == "a" then
 		jogador:setPontuacao(aviaoInimigo.pontuacao)
 		aviaoInimigo.destruido = true
+		print("ESTADO DO JOGO: OBJETO DESTRUIDO AVI")
+		print(aviaoInimigo.destruido)
+		aviaoInimigo:novoAviaoInimigo()
 	end
+	print("PONTUACAO DO JOGADOR ___" .. jogador.pontuacao)
 	return jogador.pontuacao
 end
-
-Runtime:addEventListener("enterFrame", estadoDoJogo)
 
 return estadoDoJogo

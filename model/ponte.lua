@@ -3,4 +3,9 @@ local ponte = {
 	destruida = false,
 }
 
+function ponte:novaPonte()
+	ponte.pontuacao = 15
+	ponte.destruida = false
+end
+
 return ponte

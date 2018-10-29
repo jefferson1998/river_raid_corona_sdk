@@ -3,4 +3,9 @@ local helicoptero = {
 	destruido = false
 }
 
+function helicoptero:novoHelicoptero()
+	helicoptero.pontuacao = 12
+	helicoptero.destruido = false
+end
+
 return helicoptero
