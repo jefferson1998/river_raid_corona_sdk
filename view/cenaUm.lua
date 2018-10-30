@@ -1,24 +1,12 @@
 local composer = require ("composer")
 local cena = composer.newScene( )
-local widget= require ("widget")
-
-function cena:touch()
-    composer.gotoScene( "view.cenaJogo" )
-end
+local mapa = require ("view.mapaTeste")
 
 function cena:create( event )
+ 	mapa:configurandoImagens()
+ 	mapa:adicionandoFisica()
     
     local objetosDaCena = self.view
-    local planoDeFundo = display.newRect(display.contentCenterX ,display.contentCenterY, display.actualContentWidth,display.actualContentHeight)
-    planoDeFundo:setFillColor(1,1,1)
-    local river = display.newImage("resource/imagens/imagemMenu.png", display.contentCenterX ,display.contentCenterY * 0.5)
-    local botao = display.newImage("resource/imagens/botaoMenu.png",display.contentCenterX ,display.contentCenterY * 1.5 )
-    local texto = display.newImage("resource/imagens/textoRai.png",display.contentCenterX ,display.contentCenterY *1.1 )
-    objetosDaCena:insert(planoDeFundo)
-    objetosDaCena:insert(river)
-    objetosDaCena:insert(botao)
-
-    botao:addEventListener("touch", cena)
     -- Code here runs when the cena is first created but has not yet appeared on screen
     
  

@@ -1,5 +1,5 @@
 local jato = {
-	combustivel = 0
+	combustivel = 100
 }
 
 

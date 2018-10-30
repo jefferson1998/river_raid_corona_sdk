@@ -12,30 +12,48 @@ function estadoDoJogo:enterFrame(argObjeto)
 	if argObjeto.id == "p" then
 		jogador:setPontuacao(ponte.pontuacao)
 		ponte.destruida = true
-		print("ESTADO DO JOGO: OBJETO DESTRUIDO Ponte")
-		print(ponte.destruida)
+		-- print("ESTADO DO JOGO: OBJETO DESTRUIDO Ponte")
+		-- print(ponte.destruida)
 		ponte:novaPonte()
 	elseif argObjeto.id == "h" then
 	 	jogador:setPontuacao(helicoptero.pontuacao)
 		helicoptero.destruido = true
-		print("ESTADO DO JOGO:  OBJETO DESTRUIDO Heli")
-		print(helicoptero.destruido)
+		-- print("ESTADO DO JOGO:  OBJETO DESTRUIDO Heli")
+		-- print(helicoptero.destruido)
 		helicoptero:novoHelicoptero()
 	elseif argObjeto.id == "b" then
 	 	jogador:setPontuacao(barco.pontuacao)
 		barco.destruido = true
-		print("ESTADO DO JOGO: OBJETO DESTRUIDO BARCO")
-		print( barco.destruido)
+		-- print("ESTADO DO JOGO: OBJETO DESTRUIDO BARCO")
+		-- print( barco.destruido)
 		barco:novoBarco()
 	elseif argObjeto.id == "a" then
 		jogador:setPontuacao(aviaoInimigo.pontuacao)
 		aviaoInimigo.destruido = true
-		print("ESTADO DO JOGO: OBJETO DESTRUIDO AVI")
-		print(aviaoInimigo.destruido)
+		-- print("ESTADO DO JOGO: OBJETO DESTRUIDO AVI")
+		-- print(aviaoInimigo.destruido)
 		aviaoInimigo:novoAviaoInimigo()
 	end
 	print("PONTUACAO DO JOGADOR ___" .. jogador.pontuacao)
+end
+
+function estadoDoJogo:dimunuirCombustivel()
+	jato.combustivel = jato.combustivel - 0.1
+	-- print(jato.combustivel)
+end
+
+function estadoDoJogo:getJato()
+	return jato
+end
+
+function estadoDoJogo:getPontuacao()
 	return jogador.pontuacao
+end
+
+function estadoDoJogo:reabastecerCombustivel()
+
+	jato.combustivel = jato.combustivel  + postoDeCombustivel.combustivel
+	print(jato.combustivel)
 end
 
 return estadoDoJogo

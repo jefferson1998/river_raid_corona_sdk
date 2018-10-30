@@ -7,6 +7,7 @@ physics.setGravity(0, 0 )
 local passosX = 0
 local tempo
 local mapa = {
+
 	planoDeFundo = {
 		parteDireita = display.newRect(0,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight),
 
@@ -17,7 +18,9 @@ local mapa = {
 	
 	painelDoPlayer = {
 		tela = display.newRect(display.contentCenterX, display.contentCenterY * 2.05, display.actualContentWidth, 200 ),
-		pontuacao = display.newText("Score: ", display.contentCenterX * 0.25, display.contentCenterY * 1.7, native.systemFontBold , 20 ) },
+		pontuacao = display.newText("Score: ", display.contentCenterX * 0.25, display.contentCenterY * 1.7, native.systemFontBold , 20 ),
+		combustivel = display.newText("Fuel: " , display.contentCenterX * 1.5, display.contentCenterY * 1.7, native.systemFontBold , 20 )
+	},
 	
 	barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, -10),
 
@@ -34,12 +37,14 @@ local mapa = {
 	
 	jato = 	display.newImage( "resource/imagens/jato.png", display.contentCenterX, display.contentCenterY *1.5 ),
 	
-	-- postoDeCombustivel = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *0.5, 100),
+	postosDeCombustivel = {
+		p1 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *0.5, display.contentCenterY *0.2),
+		p2 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *1.2, display.contentCenterY * - 1.4),
+	},
 	
 	botoes = botoes:novosBotoes(),
-	
+
 	botaoTiro = display.newCircle(display.contentCenterX * 1.8, display.contentCenterY * 2, 26 )
-	
 }
 
 function mapa:configurandoImagens()
@@ -77,10 +82,17 @@ function mapa:adicionandoFisica()
 	mapa.helicoptero.isFixedRotation = true
 	mapa.aviaoInimigo.isFixedRotation = true
 	mapa.jato.isFixedRotation = true
+	mapa.jato:toFront()
 end
 
-function mapa:atualizarPainelDoUsuario(pontuacao)
-	mapa.painelDoPlayer.pontuacao.text = "    Score: " .. pontuacao
+function mapa:atualizarPainelDoUsuario()
+	mapa.painelDoPlayer.pontuacao.text = "    Score: " .. estadoDoJogo:getPontuacao()
+	if estadoDoJogo:getJato().combustivel <= 200 then
+		mapa.painelDoPlayer.combustivel.text = "  Fuel: NEED"
+	else
+		mapa.painelDoPlayer.combustivel.text = "  Fuel: OK"
+	end
+
 end
 
 function mapa:touch(e)
@@ -104,11 +116,11 @@ function mapa:resetarObjetosDestruidosMapa()
 	if mapa.barco.y ~= nil then
 		if mapa.jato.contentBounds.yMax < mapa.barco.y then
 			display.remove(mapa.barco)
-			mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, display.contentCenterY * -1.5)
+			mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, display.contentCenterY * -1.6)
 
 		end
 	else
-		mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, display.contentCenterY * -1.5)
+		mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, display.contentCenterY * -1.6)
 	end
 
 	if mapa.aviaoInimigo.y ~= nil then
@@ -131,16 +143,20 @@ function mapa:resetarObjetosDestruidosMapa()
 		mapa.helicoptero = display.newImage( "resource/imagens/helicoptero.png", display.contentCenterX *1.5, display.contentCenterY * -1.2)
 	end
 
-	if mapa.objetosDoCenario.obj1.y ~= nil then
-		if  mapa.jato.contentBounds.yMax < mapa.objetosDoCenario.obj1.y  then
-			mapa.objetosDoCenario.obj1.x, mapa.objetosDoCenario.obj1.y =display.contentCenterX * 1.8 , -150
-		end
+	if  mapa.jato.contentBounds.yMax < mapa.objetosDoCenario.obj1.y  then
+		mapa.objetosDoCenario.obj1.x, mapa.objetosDoCenario.obj1.y =display.contentCenterX * 1.8 , -150
+	end
+	
+	if  mapa.jato.contentBounds.yMax < mapa.objetosDoCenario.obj2.y  then
+		mapa.objetosDoCenario.obj2.x, mapa.objetosDoCenario.obj2.y =display.contentCenterX * 0.2, -150
 	end
 
-	if mapa.objetosDoCenario.obj2.y ~= nil then
-		if  mapa.jato.contentBounds.yMax < mapa.objetosDoCenario.obj2.y  then
-			mapa.objetosDoCenario.obj2.x, mapa.objetosDoCenario.obj2.y =display.contentCenterX * 0.2, -150
-		end
+	if  mapa.jato.contentBounds.yMax < mapa.postosDeCombustivel.p1.y  then
+		mapa.postosDeCombustivel.p1.x, mapa.postosDeCombustivel.p1.y = display.contentCenterX *0.5, display.contentCenterY * - 1
+	end
+	
+	if  mapa.jato.contentBounds.yMax < mapa.postosDeCombustivel.p2.y  then
+		mapa.postosDeCombustivel.p2.x, mapa.postosDeCombustivel.p2.y = display.contentCenterX *1.4, display.contentCenterY * -1.5
 	end
 
 	if mapa.ponte.y == nil then
@@ -171,7 +187,8 @@ end
 function destruirObj(event)
 	display.remove(event.target)
 	display.remove(event.other)
-	mapa:atualizarPainelDoUsuario(estadoDoJogo:enterFrame(event.other))
+	estadoDoJogo:enterFrame(event.other)
+	mapa:atualizarPainelDoUsuario()
 end
 
 function atirar(e)
@@ -185,8 +202,11 @@ function atirar(e)
 end
 
 function moverCenario()
+	mapa:atualizarPainelDoUsuario()
 	mapa:pararJogo()
 	mapa:resetarObjetosDestruidosMapa()
+	estadoDoJogo:dimunuirCombustivel()
+	mapa:reabastecerJato()
 	-- movimentando helicoptero
 	if  mapa.helicoptero.x ~= nil and mapa.helicoptero.y ~= nil then
 
@@ -216,6 +236,24 @@ function moverCenario()
 		mapa.aviaoInimigo.y = mapa.aviaoInimigo.y + 2
 	end
 
+	if mapa.postosDeCombustivel.p1.y ~= nil then
+		mapa.postosDeCombustivel.p1.y = mapa.postosDeCombustivel.p1.y + 2
+
+	end
+
+	if mapa.postosDeCombustivel.p2.y ~= nil then
+		mapa.postosDeCombustivel.p2.y = mapa.postosDeCombustivel.p2.y + 2
+	end
+
+end
+
+function mapa:reabastecerJato()
+	-- print((mapa.jato.x))
+	if (math.floor(mapa.jato.y) == math.floor(mapa.postosDeCombustivel.p1.y))
+		or 
+	   (math.floor(mapa.jato.y) == math.floor(mapa.postosDeCombustivel.p2.y))then
+		estadoDoJogo:reabastecerCombustivel()
+	end
 end
 
 local update = function ()

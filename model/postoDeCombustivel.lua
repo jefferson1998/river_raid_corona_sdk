@@ -1,7 +1,5 @@
 local postoDeCombustivel = {
-	pontuacao = 10,
-	destruido = false,
-	combustivel = 100,
+	combustivel = 50
 }
 
 return postoDeCombustivel
