@@ -5,7 +5,7 @@ physics.start()
 physics.setGravity(0, 0 )
 
 local passosX = 0
-
+local tempo
 local mapa = {
 	planoDeFundo = {
 		parteDireita = display.newRect(0,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight),
@@ -58,10 +58,11 @@ function mapa:configurandoImagens()
 	mapa.barco.id = "b"
 	mapa.planoDeFundo.parteDireita:setFillColor(0,0.8,0.2)
 	mapa.planoDeFundo.parteEsquerda:setFillColor(0,0.8,0.2)
+	mapa.planoDeFundo.parteEsquerda.id = "pe"
+	mapa.planoDeFundo.parteDireita.id = "pd"
 	mapa.limiteDoMapa:setFillColor(0,0.5,1)
 	mapa.painelDoPlayer.tela:setFillColor(0.5,0.2,0.5 )
 end
-
 
 function mapa:adicionandoFisica()
 	physics.addBody(mapa.planoDeFundo.parteDireita, "static")
@@ -78,45 +79,11 @@ function mapa:adicionandoFisica()
 	mapa.jato.isFixedRotation = true
 end
 
-function moverCenario()
-	mapa:resetarObjetosDestruidosMapa()
-	-- movimentando helicoptero
-	if  mapa.helicoptero.x ~= nil and mapa.helicoptero.y ~= nil then
-
-		mapa.helicoptero.x = mapa.helicoptero.x - 0.4
-		mapa.helicoptero.y = mapa.helicoptero.y + 2
-	end
-	
-	-- movimentando objetos do "staticos" --
-	mapa.objetosDoCenario.obj1.y = mapa.objetosDoCenario.obj1.y + 2
-	mapa.objetosDoCenario.obj2.y = mapa.objetosDoCenario.obj2.y + 2
-
-	-- movimentando ponte --
-	if mapa.ponte.y ~= nil then
-			mapa.ponte.y = mapa.ponte.y + 2
-
-	end
-
-	-- movimentando barco --
-	if mapa.barco.x ~= nil and mapa.barco.y ~= nil then
-		mapa.barco.x = mapa.barco.x + 0.4
-		mapa.barco.y = mapa.barco.y + 2
-
-	end
-
-	-- movimentando o avião inimigo
-	if mapa.aviaoInimigo.y ~= nil then
-		mapa.aviaoInimigo.y = mapa.aviaoInimigo.y + 2
-	end
-
-end
-
-function mapa:atualizaPainelDoUsuario(pontuacao)
+function mapa:atualizarPainelDoUsuario(pontuacao)
 	mapa.painelDoPlayer.pontuacao.text = "    Score: " .. pontuacao
 end
 
 function mapa:touch(e)
-
 	if e.phase == "began" then
 		if e.target.myName == "right" then
 			passosX = 1.3
@@ -124,52 +91,14 @@ function mapa:touch(e)
 		elseif e.target.myName == "left" then
 				passosX = -1.3
 		end
-
 	elseif (e.phase == "ended" or e.phase == "canceled") then
 		passosX = 0
 	end
-
 end
 
-function atirar(e)
-	if e.phase == "began" then
-		local tiro = display.newRect(mapa.jato.x, mapa.jato.y-25,5,3)
-		physics.addBody(tiro)
-		tiro:setLinearVelocity(0,-300)
-		tiro:addEventListener("collision", destruirObj)
-
-	end	
+function mapa:pararJogo()
+	mapa.jato:addEventListener("collision", fimDeJogo)
 end
-
--- function mapa:pararCenario()
--- 	mapa.barco.x = mapa.barco.x + 0
--- 	mapa.barco.y = mapa.barco.y + 0
-
--- 	mapa.aviaoInimigo.y = mapa.aviaoInimigo.y + 0
-
--- 	mapa.helicoptero.x = mapa.helicoptero.x + 0
--- 	mapa.helicoptero.y = mapa.helicoptero.y + 0
-
--- 	mapa.ponte.y = mapa.ponte.y + 0
--- 	mapa.objetosDoCenario.obj1.y = mapa.objetosDoCenario.obj1.y + 0
--- 	mapa.objetosDoCenario.obj2.y = mapa.objetosDoCenario.obj2.y + 0
--- end
-
--- function mapa:pararJogo()
--- 	mapa.jato:addEventListener("collision", fimDeJogo)
--- end
-
--- function fimDeJogo()
--- 	print("entreiNoFimDeJogo")
--- 	mapa:pararCenario()
--- end
-
-function destruirObj(event)
-	display.remove(event.target)
-	display.remove(event.other)
-	mapa:atualizaPainelDoUsuario(estadoDoJogo:enterFrame(event.other))
-end
-
 
 function mapa:resetarObjetosDestruidosMapa()
 	if mapa.barco.y ~= nil then
@@ -222,6 +151,73 @@ function mapa:resetarObjetosDestruidosMapa()
 	mapa:adicionandoFisica()
 end
 
+function mapa:removerEventos()
+	for i=1, #mapa.botoes do
+		mapa.botoes[i]:removeEventListener("touch", mapa)
+	end
+	mapa.botaoTiro:removeEventListener("touch", atirar)
+end
+
+function fimDeJogo(event)
+	if event.other.id == "pe" or event.other.id == "pd" then
+
+	else
+		timer.cancel(tempo)
+	 	mapa:removerEventos()		
+		print("entreiNoFimDeJogo")
+	end
+end
+
+function destruirObj(event)
+	display.remove(event.target)
+	display.remove(event.other)
+	mapa:atualizarPainelDoUsuario(estadoDoJogo:enterFrame(event.other))
+end
+
+function atirar(e)
+	if e.phase == "began" then
+		local tiro = display.newRect(mapa.jato.x, mapa.jato.y-25,5,3)
+		physics.addBody(tiro)
+		tiro:setLinearVelocity(0,-300)
+		tiro:addEventListener("collision", destruirObj)
+
+	end	
+end
+
+function moverCenario()
+	mapa:pararJogo()
+	mapa:resetarObjetosDestruidosMapa()
+	-- movimentando helicoptero
+	if  mapa.helicoptero.x ~= nil and mapa.helicoptero.y ~= nil then
+
+		mapa.helicoptero.x = mapa.helicoptero.x - 0.4
+		mapa.helicoptero.y = mapa.helicoptero.y + 2
+	end
+	
+	-- movimentando objetos do "staticos" --
+	mapa.objetosDoCenario.obj1.y = mapa.objetosDoCenario.obj1.y + 2
+	mapa.objetosDoCenario.obj2.y = mapa.objetosDoCenario.obj2.y + 2
+
+	-- movimentando ponte --
+	if mapa.ponte.y ~= nil then
+			mapa.ponte.y = mapa.ponte.y + 2
+
+	end
+
+	-- movimentando barco --
+	if mapa.barco.x ~= nil and mapa.barco.y ~= nil then
+		mapa.barco.x = mapa.barco.x + 0.4
+		mapa.barco.y = mapa.barco.y + 2
+
+	end
+
+	-- movimentando o avião inimigo
+	if mapa.aviaoInimigo.y ~= nil then
+		mapa.aviaoInimigo.y = mapa.aviaoInimigo.y + 2
+	end
+
+end
+
 local update = function ()
 	mapa.jato.x = mapa.jato.x + passosX	
 end
@@ -233,7 +229,6 @@ end
 mapa.botaoTiro:addEventListener( "touch", atirar )
 Runtime:addEventListener("enterFrame", update)
 
-
-timer.performWithDelay( 15, moverCenario, 0 )
+tempo = timer.performWithDelay( 15, moverCenario, 0 )
 
 return mapa

@@ -26,4 +26,4 @@
 
 -- timer.performWithDelay( 500, moverMapa, 0)
 local composer = require( "composer" )
-composer.gotoScene( "view.cenaUm" )
+composer.gotoScene( "view.cenaMenu" )
