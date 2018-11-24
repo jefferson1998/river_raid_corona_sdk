@@ -1,15 +1,18 @@
 local composer = require ("composer")
 local cena = composer.newScene( )
 local mapa = require ("view.mapaTeste")
-
 function cena:create( event )
- 	mapa:configurandoImagens()
- 	mapa:adicionandoFisica()
-    
+    local tempo
     local objetosDaCena = self.view
-    -- Code here runs when the cena is first created but has not yet appeared on screen
-    
- 
+    mapa:start()
+
+    function update()
+        if mapa:getRetornarMenu() == true then
+            composer.gotoScene("view.cenaMenu")
+        end
+    end
+    Runtime:addEventListener("enterFrame", update)
+
 end
  
  
@@ -20,6 +23,7 @@ function cena:show( event )
     local phase = event.phase
  
     if ( phase == "will" ) then
+
         -- Code here runs when the cena is still off screen (but is about to come on screen)
  
     elseif ( phase == "did" ) then
@@ -37,8 +41,11 @@ function cena:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the cena is on screen (but is about to go off screen)
- 
+        table.remove(mapa)
+
     elseif ( phase == "did" ) then
+            table.remove(mapa)
+
         -- Code here runs immediately after the cena goes entirely off screen
  
     end
@@ -49,12 +56,10 @@ end
 function cena:destroy( event )
  
     local cenaGroup = self.view
-    -- Code here runs prior to the removal of cena's view
- 
 end
  
  
--- -----------------------------------------------------------------------------------
+-- ----------------------   -------------------------------------------------------------
 -- cena event function listeners
 -- -----------------------------------------------------------------------------------
 cena:addEventListener( "create", cena )

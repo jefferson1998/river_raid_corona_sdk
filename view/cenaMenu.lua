@@ -5,7 +5,7 @@ local widget= require ("widget")
 function cena:touch()
     composer.gotoScene( "view.cenaJogo" )
 end
-
+ 
 function cena:create( event )
     
     local objetosDaCena = self.view
@@ -17,6 +17,7 @@ function cena:create( event )
     objetosDaCena:insert(planoDeFundo)
     objetosDaCena:insert(river)
     objetosDaCena:insert(botao)
+    objetosDaCena:insert(texto)
 
     botao:addEventListener("touch", cena)
     -- Code here runs when the cena is first created but has not yet appeared on screen

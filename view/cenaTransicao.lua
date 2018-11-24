@@ -1,13 +1,16 @@
 local composer = require ("composer")
 local cena = composer.newScene( )
 
+
+function cena:touch()
+    composer.removeScene("view.cenaJogo")
+    composer.gotoScene("view.cenaMenu")
+end
+
+
 function cena:create( event )
-
-
-    local objetosDaCena = self.view
-    
-    -- Code here runs when the cena is first created but has not yet appeared on screen
- 
+    -- local planoDeFundo = display.newRect(display.contentCenterX ,display.contentCenterY, display.actualContentWidth,display.actualContentHeight)
+    -- planoDeFundo:setFillColor(1,1,1)
 end
  
  
@@ -18,9 +21,13 @@ function cena:show( event )
     local phase = event.phase
  
     if ( phase == "will" ) then
+
         -- Code here runs when the cena is still off screen (but is about to come on screen)
  
     elseif ( phase == "did" ) then
+        print( "((show scene RestartDummy's view))" ) 
+        composer.removeScene( "view.cenaJogo" ) 
+        composer.gotoScene( "view.cenaJogo", "fade", 0 )  
         -- Code here runs when the cena is entirely on screen
  
     end
@@ -47,8 +54,7 @@ end
 function cena:destroy( event )
  
     local cenaGroup = self.view
-    -- Code here runs prior to the removal of cena's view
- 
+    -- cenaGroup:remove(mapa)
 end
  
  

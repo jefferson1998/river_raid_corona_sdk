@@ -53,4 +53,10 @@ function botoes:novosBotoes()
 	return botoes
 end
 
+function botoes:removerBotoes()
+	for i=1,#botoes do
+		display.remove(botoes[i])
+	end
+end
+
 return botoes

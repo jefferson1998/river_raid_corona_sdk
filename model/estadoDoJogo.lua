@@ -5,6 +5,7 @@ local helicoptero = require ("model.helicoptero")
 local aviaoInimigo = require ("model.aviaoInimigo")
 local postoDeCombustivel = require ("model.postoDeCombustivel")
 local jogador = require ("model.jogador")
+local bancoDeDados = require ("model.bancoDeDados")
 
 local estadoDoJogo = {}
 
@@ -50,10 +51,32 @@ function estadoDoJogo:getPontuacao()
 	return jogador.pontuacao
 end
 
-function estadoDoJogo:reabastecerCombustivel()
+function estadoDoJogo:setMatarJogador()
+	return jogador:setMorrer()
+end
 
+function estadoDoJogo:getVidaJogador()
+	return jogador:getVida()
+end
+
+function estadoDoJogo:getNovoJogador()
+	return jogador:novoJogador()
+end
+
+function estadoDoJogo:reabastecerCombustivel()
 	jato.combustivel = jato.combustivel  + postoDeCombustivel.combustivel
 	print(jato.combustivel)
+end
+
+function estadoDoJogo:salvarJogador(jogador)
+
+end
+
+function estadoDoJogo:bancoDeDadosTest()
+	bancoDeDados:criarTabelaJogador()
+	bancoDeDados:inserirJogador(jogador)	
+	-- bancoDeDados:deletarTodosJogadores()
+	bancoDeDados:recuperarJogadores()
 end
 
 return estadoDoJogo
