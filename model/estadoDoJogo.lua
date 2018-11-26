@@ -43,6 +43,10 @@ function estadoDoJogo:dimunuirCombustivel()
 	-- print(jato.combustivel)
 end
 
+function estadoDoJogo:getJogador()
+	return jogador
+end
+
 function estadoDoJogo:getJato()
 	return jato
 end

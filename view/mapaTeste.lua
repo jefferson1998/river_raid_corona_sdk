@@ -77,30 +77,6 @@ function mapa:start()
 		mapa.painelDoPlayer.tela:setFillColor(0.5,0.2,0.5 )
 	end
 
-	function limparMapa(event)
-		if event.phase == "began" then
-			display.remove(event.target)
-			display.remove(mapa.textRestart)
-			display.remove(event.other)
-			display.remove(mapa.jato)
-			display.remove(mapa.aviaoInimigo)
-			display.remove(mapa.barco)
-			display.remove(mapa.objetosDoCenario.obj1)
-			display.remove(mapa.objetosDoCenario.obj2)
-			display.remove(mapa.helicoptero)
-			display.remove(mapa.planoDeFundo.parteDireita)
-			display.remove(mapa.planoDeFundo.parteEsquerda)
-			display.remove(mapa.limiteDoMapa)
-			display.remove(mapa.painelDoPlayer.tela)
-			display.remove(mapa.postosDeCombustivel.p1)
-			display.remove(mapa.postosDeCombustivel.p2)
-			display.remove(mapa.ponte)
-			display.remove(mapa.painelDoPlayer.pontuacao)
-			display.remove(mapa.painelDoPlayer.combustivel)
-			mapa.retornarMenu = true
-		end	
-	end
-
 	function mapa:isRestartJogo()
 		return mapa.restartJogo
 	end
@@ -121,36 +97,11 @@ function mapa:start()
 		mapa.jato:toFront()
 	end
 
-	function restartJogo(event)
-		if resultResume == nil then
-			if event.phase == "began" then
-				estadoDoJogo:getNovoJogador()
-				limparMapa(event)
-				mapa.planoDeFundo.parteDireita = display.newRect(0,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight)
-				mapa.planoDeFundo.parteEsquerda = display.newRect(display.actualContentWidth ,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight)
-				mapa.limiteDoMapa = display.newRect(display.contentCenterX, display.contentCenterY * 0.45, 200, 570 )
-				mapa.painelDoPlayer.tela = display.newRect(display.contentCenterX, display.contentCenterY * 2.05, display.actualContentWidth, 200 )
-				mapa.painelDoPlayer.pontuacao = display.newText("Score: ", display.contentCenterX * 0.25, display.contentCenterY * 1.7, native.systemFontBold , 20 )
-				mapa.painelDoPlayer.combustivel = display.newText("Fuel: " , display.contentCenterX * 1.5, display.contentCenterY * 1.7, native.systemFontBold , 20 )
-				mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, -10)
-				mapa.aviaoInimigo = display.newImage( "resource/imagens/aviaoInimigo.png", display.contentCenterX *0.5, display.contentCenterY * 0.8)
-				mapa.helicoptero = display.newImage( "resource/imagens/helicoptero.png", display.contentCenterX *1.5, 100)
-				mapa.ponte = display.newImage( "resource/imagens/ponte.png", display.contentCenterX *1.01, display.contentCenterY * -0.9)
-				mapa.objetosDoCenario.obj1 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 1.8, display.contentCenterY )	
-				mapa.objetosDoCenario.obj2 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 0.2, display.contentCenterY *1.5 )
-				mapa.jato = display.newImage( "resource/imagens/jato.png", display.contentCenterX, display.contentCenterY *1.5)
-				mapa.postosDeCombustivel.p1 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *0.5, display.contentCenterY *0.2)
-				mapa.postosDeCombustivel.p2 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *1.2, display.contentCenterY * - 1.4)
-				mapa.botaoTiro = display.newCircle(display.contentCenterX * 1.8, display.contentCenterY * 2, 26 )
-				mapa.retornarMenu = false
-				mapa.textMenu = nil
-				mapa.textRestart = nil
-				result = nil
-				mapa:configurandoImagens()
-				mapa:adicionandoFisica()
-				mapa.botaoTiro:addEventListener( "touch", atirar )
-				resultResume = timer.resume(tempo)
-			end
+	function mapa:reabastecerJato()
+		if (math.floor(mapa.jato.y) == math.floor(mapa.postosDeCombustivel.p1.y))
+			or 
+		   (math.floor(mapa.jato.y) == math.floor(mapa.postosDeCombustivel.p2.y))then
+			estadoDoJogo:reabastecerCombustivel()
 		end
 	end
 
@@ -166,12 +117,6 @@ function mapa:start()
 
 	function mapa:getRetornarMenu()
 		return mapa.retornarMenu
-	end
-
-	function aplicarAceleracao( event )
-		if permitirAce == true then
-			mapa.jato.x = mapa.jato.x + (event.xGravity * 30)
-		end
 	end
 
 	function mapa:resetarObjetosDestruidosMapa()
@@ -239,12 +184,87 @@ function mapa:start()
 		end	
 	end
 
+	function aplicarAceleracao( event )
+		if permitirAce == true then
+			mapa.jato.x = mapa.jato.x + (event.xGravity * 30)
+		end
+	end
+
+	function mapa:startJogo()
+		recriandoImagens()
+	end
+
+	function recriandoImagens()
+		mapa.planoDeFundo.parteDireita = display.newRect(0,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight)
+		mapa.planoDeFundo.parteEsquerda = display.newRect(display.actualContentWidth ,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight)
+		mapa.limiteDoMapa = display.newRect(display.contentCenterX, display.contentCenterY * 0.45, 200, 570 )
+		mapa.painelDoPlayer.tela = display.newRect(display.contentCenterX, display.contentCenterY * 2.05, display.actualContentWidth, 200 )
+		mapa.painelDoPlayer.pontuacao = display.newText("Score: ", display.contentCenterX * 0.25, display.contentCenterY * 1.7, native.systemFontBold , 20 )
+		mapa.painelDoPlayer.combustivel = display.newText("Fuel: " , display.contentCenterX * 1.5, display.contentCenterY * 1.7, native.systemFontBold , 20 )
+		mapa.barco = display.newImage( "resource/imagens/barco.png", display.contentCenterX *0.5, -10)
+		mapa.aviaoInimigo = display.newImage( "resource/imagens/aviaoInimigo.png", display.contentCenterX *0.5, display.contentCenterY * 0.8)
+		mapa.helicoptero = display.newImage( "resource/imagens/helicoptero.png", display.contentCenterX *1.5, 100)
+		mapa.ponte = display.newImage( "resource/imagens/ponte.png", display.contentCenterX *1.01, display.contentCenterY * -0.9)
+		mapa.objetosDoCenario.obj1 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 1.8, display.contentCenterY )	
+		mapa.objetosDoCenario.obj2 = display.newImage( "resource/imagens/objetosDoCenario.png", display.contentCenterX * 0.2, display.contentCenterY *1.5 )
+		mapa.jato = display.newImage( "resource/imagens/jato.png", display.contentCenterX, display.contentCenterY *1.5)
+		mapa.postosDeCombustivel.p1 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *0.5, display.contentCenterY *0.2)
+		mapa.postosDeCombustivel.p2 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *1.2, display.contentCenterY * - 1.4)
+		mapa.botaoTiro = display.newCircle(display.contentCenterX * 1.8, display.contentCenterY * 2, 26 )
+		mapa.retornarMenu = false
+		mapa.textMenu = nil
+		mapa.textRestart = nil
+		result = nil
+		mapa:configurandoImagens()
+		mapa:adicionandoFisica()
+		mapa.botaoTiro:addEventListener( "touch", atirar )
+		resultResume = timer.resume(tempo)
+	end
+
+	function restartJogo(event)
+		display.remove(event.target)
+		if resultResume == nil then
+			if event.phase == "began" then
+				limparMapa()
+				permitirAce = true
+				estadoDoJogo:getNovoJogador()
+				if event.target.id == "restart" then
+					recriandoImagens()
+				end
+			end
+		end	
+		
+	end
+
+	function limparMapa()
+		-- display.remove(mapa.textMenu)
+		-- display.remove(mapa.textRestart)
+		display.remove(mapa.jato)
+		display.remove(mapa.aviaoInimigo)
+		display.remove(mapa.barco)
+		display.remove(mapa.objetosDoCenario.obj1)
+		display.remove(mapa.objetosDoCenario.obj2)
+		display.remove(mapa.helicoptero)
+		display.remove(mapa.planoDeFundo.parteDireita)
+		display.remove(mapa.planoDeFundo.parteEsquerda)
+		display.remove(mapa.limiteDoMapa)
+		display.remove(mapa.painelDoPlayer.tela)
+		display.remove(mapa.postosDeCombustivel.p1)
+		display.remove(mapa.postosDeCombustivel.p2)
+		display.remove(mapa.ponte)
+		display.remove(mapa.painelDoPlayer.pontuacao)
+		display.remove(mapa.painelDoPlayer.combustivel)
+		mapa.retornarMenu = true
+	end
+
 	function fimDeJogo(event)
 		if event.other.id ~= "pe" and event.other.id ~= "pd" then
 		 	mapa:removerEventos()
-		 	-- mapa.textMenu = display.newImage("resource/imagens/menu.png", display.contentCenterX ,display.contentCenterY * 0.5)
-		 	-- mapa.textMenu:addEventListener( "touch", limparMapa )
-		 	mapa.textRestart = display.newImage("resource/imagens/restart.png", display.contentCenterX ,display.contentCenterY * 0.7)
+		 	mapa.textMenu = display.newImage("resource/imagens/menu.png", display.contentCenterX ,display.contentCenterY * 1.1)
+		 	mapa.textMenu.id = "menu"
+		 	mapa.textMenu:addEventListener( "touch", restartJogo )
+		 	mapa.textRestart = display.newImage("resource/imagens/botaoMenu.png",display.contentCenterX ,display.contentCenterY * 1.37 )
+		 	mapa.textRestart.id = "restart"
 		 	mapa.textRestart:addEventListener( "touch", restartJogo)
 		 	estadoDoJogo:setMatarJogador()
 		end
@@ -305,14 +325,6 @@ function mapa:start()
 
 		if mapa.postosDeCombustivel.p2.y ~= nil then
 			mapa.postosDeCombustivel.p2.y = mapa.postosDeCombustivel.p2.y + 2
-		end
-	end
-
-	function mapa:reabastecerJato()
-		if (math.floor(mapa.jato.y) == math.floor(mapa.postosDeCombustivel.p1.y))
-			or 
-		   (math.floor(mapa.jato.y) == math.floor(mapa.postosDeCombustivel.p2.y))then
-			estadoDoJogo:reabastecerCombustivel()
 		end
 	end
 

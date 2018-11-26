@@ -2,7 +2,7 @@ local jogador = {nome = "Jefferson", pontuacao = 0, vida = 1}
 
 function jogador:novoJogador()
 	jogador.nome = "Jefferson" 
-	jogador.pontuacao = 0 
+	jogador.pontuacao = jogador.pontuacao
 	jogador.vida = 1
 	return jogador
 end

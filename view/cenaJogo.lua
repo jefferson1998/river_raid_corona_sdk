@@ -2,6 +2,7 @@ local composer = require ("composer")
 local cena = composer.newScene( )
 local mapa = require ("view.mapaTeste")
 function cena:create( event )
+    local iniciarJogo = composer.getVariable( "jogo" )
     local tempo
     local objetosDaCena = self.view
     mapa:start()
@@ -9,7 +10,9 @@ function cena:create( event )
     function update()
         if mapa:getRetornarMenu() == true then
             composer.gotoScene("view.cenaMenu")
+            -- print( mapa:isRestartJogo())
         end
+
     end
     Runtime:addEventListener("enterFrame", update)
 
