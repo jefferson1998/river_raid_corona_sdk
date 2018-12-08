@@ -1,4 +1,5 @@
 local composer = require ("composer")
+local botoes = require ("view.botao")
 local estadoDoJogo = require ("model.estadoDoJogo")
 local physics = require "physics"
 physics.start()
@@ -7,6 +8,9 @@ local passosX = 0
 local tempo
 local permitirAce = true
 local result, resultResume
+local composer = require ("composer")
+local listaDeTiros = {}
+local bancoDeDados = require ("bd.bancoDeDados")
 
 local mapa = {
 
@@ -46,9 +50,7 @@ local mapa = {
 	
 	botaoTiro = display.newCircle(display.contentCenterX * 1.8, display.contentCenterY * 2, 26 ),
 
-	retornarMenu = false,
-
-	restartJogo = nil,
+	botoes = botoes:novosBotoes(),
 	textMenu,
 	textRestart,
 }
@@ -75,10 +77,6 @@ function mapa:start()
 		mapa.planoDeFundo.parteDireita.id = "pd"
 		mapa.limiteDoMapa:setFillColor(0,0.5,1)
 		mapa.painelDoPlayer.tela:setFillColor(0.5,0.2,0.5 )
-	end
-
-	function mapa:isRestartJogo()
-		return mapa.restartJogo
 	end
 
 	function mapa:adicionandoFisica()
@@ -113,10 +111,6 @@ function mapa:start()
 			mapa.painelDoPlayer.combustivel.text = "  Fuel: OK"
 		end
 
-	end
-
-	function mapa:getRetornarMenu()
-		return mapa.retornarMenu
 	end
 
 	function mapa:resetarObjetosDestruidosMapa()
@@ -168,14 +162,24 @@ function mapa:start()
 		if mapa.ponte.y == nil then
 			mapa.ponte = display.newImage( "resource/imagens/ponte.png", display.contentCenterX, display.contentCenterY * -2.9)
 		end
-
+	
+		if #listaDeTiros > 0  then	
+			for i=1,#listaDeTiros do
+				if listaDeTiros[i] ~= nil then
+					if listaDeTiros[i].y ~= nil then
+						if listaDeTiros[i].y < 0 then
+							mapa:removerTiro(listaDeTiros[i])
+						end	
+					end
+				end
+			end
+		end
 		mapa:configurandoImagens() 
 		mapa:adicionandoFisica()
 	end
 
 	function mapa:removerEventos()
 		if result == nil then
-			-- estadoDoJogo:bancoDeDadosTest()
 			display.remove(mapa.botaoTiro)
 			mapa.botaoTiro:removeEventListener("touch", atirar)
 			permitirAce = false
@@ -184,17 +188,17 @@ function mapa:start()
 		end	
 	end
 
-	function aplicarAceleracao( event )
+	function mapa:accelerometer(event)
 		if permitirAce == true then
-			mapa.jato.x = mapa.jato.x + (event.xGravity * 30)
+			if(mapa.jato.x ~= nil) then
+				if(display.contentCenterY * 0.45 ~= mapa.jato.x or  display.actualContentWidth ~= mapa.jato.x) then
+						mapa.jato.x = mapa.jato.x + (event.xGravity * 30)
+				end
+			end
 		end
 	end
 
-	function mapa:startJogo()
-		recriandoImagens()
-	end
-
-	function recriandoImagens()
+	function mapa:recriandoImagens()
 		mapa.planoDeFundo.parteDireita = display.newRect(0,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight)
 		mapa.planoDeFundo.parteEsquerda = display.newRect(display.actualContentWidth ,display.contentCenterY * 0.45, display.actualContentWidth *0.38, display.actualContentHeight)
 		mapa.limiteDoMapa = display.newRect(display.contentCenterX, display.contentCenterY * 0.45, 200, 570 )
@@ -211,82 +215,25 @@ function mapa:start()
 		mapa.postosDeCombustivel.p1 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *0.5, display.contentCenterY *0.2)
 		mapa.postosDeCombustivel.p2 = display.newImage( "resource/imagens/postoDeCombustivel.png", display.contentCenterX *1.2, display.contentCenterY * - 1.4)
 		mapa.botaoTiro = display.newCircle(display.contentCenterX * 1.8, display.contentCenterY * 2, 26 )
-		mapa.retornarMenu = false
-		mapa.textMenu = nil
-		mapa.textRestart = nil
 		result = nil
 		mapa:configurandoImagens()
 		mapa:adicionandoFisica()
-		mapa.botaoTiro:addEventListener( "touch", atirar )
+		mapa.botaoTiro:addEventListener( "touch", atirar )			
+		mapa.botoes = botoes:novosBotoes()
+		mapa:touchInBotoes()
 		resultResume = timer.resume(tempo)
 	end
 
-	function restartJogo(event)
-		display.remove(event.target)
-		if resultResume == nil then
-			if event.phase == "began" then
-				limparMapa()
-				permitirAce = true
-				estadoDoJogo:getNovoJogador()
-				if event.target.id == "restart" then
-					recriandoImagens()
-				end
+	function mapa:removerTiro(tiro)
+		for i=1,#listaDeTiros do
+			if listaDeTiros[i] == tiro then
+				display.remove(listaDeTiros[i])
+				table.remove( listaDeTiros, i)
 			end
-		end	
-		
+		end		
 	end
 
-	function limparMapa()
-		-- display.remove(mapa.textMenu)
-		-- display.remove(mapa.textRestart)
-		display.remove(mapa.jato)
-		display.remove(mapa.aviaoInimigo)
-		display.remove(mapa.barco)
-		display.remove(mapa.objetosDoCenario.obj1)
-		display.remove(mapa.objetosDoCenario.obj2)
-		display.remove(mapa.helicoptero)
-		display.remove(mapa.planoDeFundo.parteDireita)
-		display.remove(mapa.planoDeFundo.parteEsquerda)
-		display.remove(mapa.limiteDoMapa)
-		display.remove(mapa.painelDoPlayer.tela)
-		display.remove(mapa.postosDeCombustivel.p1)
-		display.remove(mapa.postosDeCombustivel.p2)
-		display.remove(mapa.ponte)
-		display.remove(mapa.painelDoPlayer.pontuacao)
-		display.remove(mapa.painelDoPlayer.combustivel)
-		mapa.retornarMenu = true
-	end
-
-	function fimDeJogo(event)
-		if event.other.id ~= "pe" and event.other.id ~= "pd" then
-		 	mapa:removerEventos()
-		 	mapa.textMenu = display.newImage("resource/imagens/menu.png", display.contentCenterX ,display.contentCenterY * 1.1)
-		 	mapa.textMenu.id = "menu"
-		 	mapa.textMenu:addEventListener( "touch", restartJogo )
-		 	mapa.textRestart = display.newImage("resource/imagens/botaoMenu.png",display.contentCenterX ,display.contentCenterY * 1.37 )
-		 	mapa.textRestart.id = "restart"
-		 	mapa.textRestart:addEventListener( "touch", restartJogo)
-		 	estadoDoJogo:setMatarJogador()
-		end
-	end
-
-	function destruirObj(event)
-		display.remove(event.target)
-		display.remove(event.other)
-		estadoDoJogo:enterFrame(event.other)
-		mapa:atualizarPainelDoUsuario()
-	end
-
-	function atirar(e)
-		if e.phase == "began" then
-			local tiro = display.newRect(mapa.jato.x, mapa.jato.y-25,5,3)
-			physics.addBody(tiro)
-			tiro:setLinearVelocity(0,-300)
-			tiro:addEventListener("collision", destruirObj)
-		end	
-	end
-
-	function enterFrame()
+	function mapa:timer(event)
 		mapa:atualizarPainelDoUsuario()
 		mapa.jato:addEventListener("collision", fimDeJogo)		
 		mapa:resetarObjetosDestruidosMapa()
@@ -328,9 +275,113 @@ function mapa:start()
 		end
 	end
 
+	function mapa:touch(e)
+		if e.phase == "began" then
+			if e.target.myName == "right" then
+				passosX = 1.3
+				
+			elseif e.target.myName == "left" then
+					passosX = -1.3
+			end
+		elseif (e.phase == "ended" or e.phase == "canceled") then
+			passosX = 0
+		end
+	end
+
+	function mapa:touchInBotoes()
+		for i=1, #mapa.botoes do
+			mapa.botoes[i]:addEventListener("touch", mapa )
+		end
+	end
+
+	function mapa:limparMapa()
+		display.remove(mapa.textRestart)
+		display.remove(mapa.jato)
+		display.remove(mapa.aviaoInimigo)
+		display.remove(mapa.barco)
+		display.remove(mapa.objetosDoCenario.obj1)
+		display.remove(mapa.objetosDoCenario.obj2)
+		display.remove(mapa.helicoptero)
+		display.remove(mapa.planoDeFundo.parteDireita)
+		display.remove(mapa.planoDeFundo.parteEsquerda)
+		display.remove(mapa.limiteDoMapa)
+		display.remove(mapa.painelDoPlayer.tela)
+		display.remove(mapa.postosDeCombustivel.p1)
+		display.remove(mapa.postosDeCombustivel.p2)
+		display.remove(mapa.ponte)
+		display.remove(mapa.painelDoPlayer.pontuacao)
+		display.remove(mapa.painelDoPlayer.combustivel)
+		for i=1,#mapa.botoes do
+			display.remove(mapa.botoes[i])
+		end
+		
+	end
+
+	function mapa:enterFrame ()
+		if mapa.jato.x ~= nil and estadoDoJogo:getVidaJogador() ~= 0 then
+			mapa.jato.x = mapa.jato.x + passosX	
+		end
+	end
+
+	function restartJogo(event)
+		display.remove(event.target)
+		if resultResume == nil then
+			if event.phase == "began" then
+				bancoDeDados:atualizarPontuacao(estadoDoJogo:getPontuacao())
+				permitirAce = true
+				if event.target.id == "restart" then
+					mapa:limparMapa()
+					mapa:recriandoImagens()
+					estadoDoJogo:getNovoJogador()
+				else
+					mapa:limparMapa()
+					composer.gotoScene("view.cenaMenu")
+				end
+			end
+		end	
+		
+	end
+
+	function newTiro(x,y)
+		local novoTiro = display.newRect(x, y-25, 5, 3)
+		physics.addBody(novoTiro)
+		novoTiro:setLinearVelocity(0,-300)
+		novoTiro:addEventListener("collision", destruirObj)
+		return novoTiro
+	end
+
+	function destruirObj(event)
+		mapa:removerTiro(event.target)
+		display.remove(event.other)
+		estadoDoJogo:enterFrame(event.other)
+		mapa:atualizarPainelDoUsuario()
+	end
+
+	function atirar(e)
+		if e.phase == "began" then
+			local tiro = newTiro(mapa.jato.x, mapa.jato.y)
+			table.insert(listaDeTiros, tiro)
+		end	
+	end
+
+	function fimDeJogo(event)
+		if event.other.id ~= "pe" and event.other.id ~= "pd" then
+		 	estadoDoJogo:setMatarJogador()
+		 	mapa:removerEventos()
+		 	mapa.textMenu = display.newImage("resource/imagens/menu.png", display.contentCenterX ,display.contentCenterY * 1.1)
+		 	mapa.textMenu.id = "menu"
+		 	mapa.textMenu:addEventListener( "touch", restartJogo )
+		 	mapa.textRestart = display.newImage("resource/imagens/botaoMenu.png",display.contentCenterX ,display.contentCenterY * 1.37 )
+		 	mapa.textRestart.id = "restart"
+		 	mapa.textRestart:addEventListener( "touch", restartJogo)
+		end
+	end
+
+	mapa:touchInBotoes(	)
+	Runtime:addEventListener("enterFrame", mapa)
 	mapa.botaoTiro:addEventListener( "touch", atirar )
-	Runtime:addEventListener("accelerometer", aplicarAceleracao)
-	tempo = timer.performWithDelay( 15, enterFrame, 0 )
+	Runtime:addEventListener("accelerometer", mapa)
+	tempo = timer.performWithDelay( 15, mapa, 0 )
 
 end
 

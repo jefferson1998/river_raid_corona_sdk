@@ -5,13 +5,10 @@ local widget= require ("widget")
 function cena:touch(event)
     if event.phase == "began" then
         if event.target.id == "start" then
-            composer.setVariable( "jogo", nil )
             composer.gotoScene( "view.cenaJogo" )
-        end
-        if event.target.id == "exit" then
+        elseif event.target.id == "exit" then
             native.requestExit()
-        end
-        if event.target.id == "ranking" then
+        elseif event.target.id == "ranking" then
             composer.gotoScene( "view.cenaRanking" )
         end
     end
@@ -41,60 +38,18 @@ function cena:create( event )
     botao:addEventListener("touch", cena)
     botaoRanking:addEventListener("touch", cena)
     botaoSair:addEventListener("touch", cena)
-    -- Code here runs when the cena is first created but has not yet appeared on screen
     
- 
 end
  
- 
--- show()
-function cena:show( event )
- 
-    local cenaGroup = self.view
-    local phase = event.phase
- 
-    if ( phase == "will" ) then
-        -- Code here runs when the cena is still off screen (but is about to come on screen)
- 
-    elseif ( phase == "did" ) then
-        -- Code here runs when the cena is entirely on screen
- 
-    end
-end
- 
- 
--- hide()
-function cena:hide( event )
- 
-    local cenaGroup = self.view
-    local phase = event.phase
- 
-    if ( phase == "will" ) then
-        -- Code here runs when the cena is on screen (but is about to go off screen)
- 
-    elseif ( phase == "did" ) then
-        -- Code here runs immediately after the cena goes entirely off screen
- 
-    end
-end
- 
- 
+
 -- destroy()
 function cena:destroy( event )
  
     local cenaGroup = self.view
-    -- Code here runs prior to the removal of cena's view
- 
+    display.remove(cenaGroup) 
 end
  
- 
--- -----------------------------------------------------------------------------------
--- cena event function listeners
--- -----------------------------------------------------------------------------------
 cena:addEventListener( "create", cena )
-cena:addEventListener( "show", cena )
-cena:addEventListener( "hide", cena )
 cena:addEventListener( "destroy", cena )
--- -----------------------------------------------------------------------------------
  
 return cena
